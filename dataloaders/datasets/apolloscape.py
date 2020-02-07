@@ -144,7 +144,8 @@ class COCOSegmentation(Dataset):
     def __len__(self):
         return len(self.ids)
 
-
+# __name__ == __main__ append desired different modules into dataset to deploy them
+# in this dataset
 
 if __name__ == "__main__":
     from dataloaders import custom_transforms as tr
