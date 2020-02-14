@@ -10,7 +10,7 @@ class Path(object):
         elif dataset == 'coco':
             return '/path/to/datasets/coco/'
         elif dataset == 'apolloscape':
-            return '/path/to/datasets/apolloscape'  # folder that contains apolloscape custom dataset
+            return '/path/to/datasets/ApolloScape'  # folder that contains apolloscape custom dataset
         else:
             print('Dataset {} not available.'.format(dataset))
             raise NotImplementedError
