@@ -9,7 +9,7 @@ from dataloaders import custom_transforms as tr
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-class ApolloScapesegmentation(Dataset):
+class ApolloScape(Dataset):
     NUM_CLASSES = 38
     
        def __init__(self,
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     args.base_size = 513
     args.crop_size = 513
 
-    apollo_val = ApolloScapesegmentation(args, split='val')
+    apollo_val = ApolloScape(args, split='val')
 
     dataloader = DataLoader(apollo_val, batch_size=4, shuffle=True, num_workers=0)
 
