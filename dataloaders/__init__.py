@@ -37,7 +37,7 @@ def make_data_loader(args, **kwargs):
         test_loader = None
         return train_loader, val_loader, test_loader, num_class
     
-    elif args.dataset == 'ApolloScape' :
+    elif args.dataset == 'apolloscape' :
         train_set == apolloscape.ApolloScapeSegmentation(args, split='train')
         val_set == apolloscape.ApolloScapeSegmentation(args, split='val')
         num_class = train_set.NUM_CLASSES
