@@ -1,148 +1,150 @@
-import numpy as np
-import torch
-from torch.utils.data import Dataset
-from modeling import deeplab
-from modeling import aspp
-from modeling.aspp import _ASPPModule, ASPP
-from modeling.deeplab import DeepLab
-from doc import  deeplab_xception
-from modeling.backbone import xception
-from mypath import Path
-import json
-from utils import calculate_weights,loss,lr_scheduler,metrics,saver,summaries
-from tqdm import trange
 import os
-from pycocotools.coco import COCO
-from pycocotools import mask
-import pycocotools._mask as _mask
+import numpy as np
+import scipy.misc as m
+from PIL import Image
+from torch.utils import data
+from mypath import Path
 from torchvision import transforms
 from dataloaders import custom_transforms as tr
-from PIL import Image, ImageFile
-from mypath import Path
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-class COCOSegmentation(Dataset):
+class ApolloScapesegmentation(Dataset):
     NUM_CLASSES = 38
-    CAT_LIST = [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-        31, 32, 33, 34, 255, 255]
-
-    def __init__(self,
+    
+       def __init__(self,
                  args,
-                 base_dir=Path.db_root_dir('coco'),
-                 split='train',
-                 year='2017'):
-        super().__init__()
-        # Annotations && Instances path via Json
-        ann_file = os.path.join(base_dir, 'annotations/instances_{}{}.json'.format(split, year))
-
-        # pth file is great alternative to impart PythonPath Environment Variables
-        # Annotations && Ids files PTH
-        ids_file = os.path.join(base_dir, 'annotations/{}_ids_{}.pth'.format(split, year))
-
-        # images directory containing training_set - > 2017
-        self.img_dir = os.path.join(base_dir, 'images/{}{}'.format(split, year))
-
-        # Split in this respect, train set
-        self.split = split
-
-        # Annotation file
-        self.coco = COCO(ann_file)
-        self.coco_mask = mask
-
-        if os.path.exists(ids_file):
-            self.ids = torch.load(ids_file)
-
-        else:
-            ids = list(self.coco.imgs.keys())
-            self.ids = self._preprocess(ids, ids_file)
-        self.args = args
-
-    def __getitem__(self, index):
-        _img, _target = self._make_img_gt_point_pair(index)
-
-        sample = {'image': _img, 'label': _target}
-
-        #### Train Set ####
-        if self.split == "train":
-            return self.transform_tr(sample)
-
-       ###### validation set ####
-        elif self.split == 'val':
-            return self.transform_val(sample)
-
-    def _make_img_gt_point_pair(self, index):
-        coco = self.coco
-        img_id = self.ids[index]
-        img_metadata = coco.loadImgs(img_id)[0]
-        path = img_metadata['file_name']
-        _img = Image.open(os.path.join(self.img_dir, path)).convert('RGB')
-        cocotarget = coco.loadAnns(coco.getAnnIds(imgIds=img_id))
-        _target = Image.fromarray(self._gen_seg_mask(
-            cocotarget, img_metadata['height'], img_metadata['width']))
-
-        return _img, _target
-
-    def _preprocess(self, ids, ids_file):
-        print("Preprocessing mask, this will take a while. " +
-              "But don't worry, it only run once for each split.")
-        tbar = trange(len(ids))
-        new_ids = []
-        for i in tbar:
-            img_id = ids[i]
-            cocotarget = self.coco.loadAnns(self.coco.getAnnIds(imgIds=img_id))
-            img_metadata = self.coco.loadImgs(img_id)[0]
-            mask = self._gen_seg_mask(cocotarget, img_metadata['height'],
-                                      img_metadata['width'])
-            # more than 1k pixels
-            if (mask > 0).sum() > 1000:
-                new_ids.append(img_id)
-            tbar.set_description('Doing: {}/{}, got {} qualified images'. \
-                                 format(i, len(ids), len(new_ids)))
-        print('Found number of qualified images: ', len(new_ids))
-        torch.save(new_ids, ids_file)
-        return new_ids
-
-    def _gen_seg_mask(self, target, h, w):
-        mask = np.zeros((h, w), dtype=np.uint8)
-        coco_mask = self.coco_mask
-        for instance in target:
-            rle = coco_mask.frPyObjects(instance['segmentation'], h, w)
-            m = coco_mask.decode(rle)
-            cat = instance['category_id']
-            if cat in self.CAT_LIST:
-                c = self.CAT_LIST.index(cat)
+                 root_dir=Path.db_root_dir('apolloscape'),
+                 split = 'train'):
+            super().__init__()
+            # acces the dataset via directory
+            self._root_dir = root_dir
+            
+            # Original  Jpg images as input
+            self._image_dir = os.path.join(self._root_dir, 'Training_Images')
+            
+            # Grayscale images as output
+            self._cat_dir = os.path.join(self._root_dir, 'Grayscale_Images001' )
+            
+            # if split == train 
+            if isinstance(split,str):
+                self.split = [split] 
+            # otherwise, sort files and find train dataset in directory  
             else:
-                continue
-            if len(m.shape) < 3:
-                mask[:, :] += (mask == 0) * (m * c)
-            else:
-                mask[:, :] += (mask == 0) * (((np.sum(m, axis=2)) > 0) * c).astype(np.uint8)
-        return mask
-    # train transform
-    def transform_tr(self, sample):
-        composed_transforms = transforms.Compose([
-            tr.RandomHorizontalFlip(),
-            tr.RandomScaleCrop(base_size=self.args.base_size, crop_size=self.args.crop_size),
-            tr.RandomGaussianBlur(),
-            tr.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-            tr.ToTensor()])
+                
+                split.sort()
+                self.split = split
+                
+            # parse arguments 
+            self.args = args
+            
+            # Defining train and validation images  through__split__dir() - function
+            # Input is '.jpg' and output is '.png'
+            
+            _splits_dir = os.path.join(self._root_dir, 'Record001', 'Camera 5')
+            # create image_ids array,images as well as categories in order to append parameters into array
+            self.im_ids = []
+            self.images = []
+            self.categories = []
+            
+           # loop through train file
+           for splt in self.split:
+                
+                # then, concatenating files inside one another, find csv file and read i
+                with open(os.path.join(os.path.join(_splits_dir, splt + '.csv')),r) as f:
+                    
+                    # initialize lines and read all lines of f function insider directory
+                    lines = f.read().splitlines()
+                    
+                # Enumurate lines through loop, once we have also input(.jpg) and output(.png) 
+                # existed in the training file as well as csv file all together
+                
+                for ii, line in enumurate(lines):
+                    
+                    # read input images which is regarded as jpg
+                    _image = os.path.join(self._image_dir, line + '.jpg')
+                    _cat = os.path.join(self._cat_dir, line + '.png')
+                    
+                    # check whether required _image file exist or not
+                    assert.os.path.isfile(_image)
+                    
+                    # check whether required _cat file exist or not
+                    assert.os.path.isfile(_cat)
+                    
+                    # then as initialized above, append line which is following path numerate
+                    # and will be regarded as csv file, append it to im_ids
+                    self.im_ids.append(line)
+                    
+                    # append _image with '.jpg' into images array
+                    self.images.append(_image)
+                    
+                    # append _cat images with '.png' into categories array
+                    self.categories.append(_cat)
+               
+                assert(len(self.images) == len(self.categories))
+                
+                # Display status
+                print('Number of images in {}: {:d}'.format(split,  len(self.images)))
+                
+                
+       # return Length of Ground truth images
+       def __len__(self):
+        return len(self.images)
+      
+       # Use getitem to access each image existed in folder
+       def __getitem__(self, index):
+            
+            # get an image and corresponding label
+            _img, _target = self._make_img_gt_point_pair(index)
+            
+            # sample image and corresponding label and class id pair
+            sample = {'image': _img, 'target': _target}
+            
+            # Accordingly, take images one by one from train
+            for split in self.split:
+                # transfom image-label pair while training
+                if split == "train":
+                    return self.transform_tr(sample)
+                # transform image-label pair by validating
+                else split == 'val':
+                    return self.transform_val(sample)
+                
+                
+       #  after accessing image-label pair, 
+       # by calling this function we open image and convert to RGB
+       def _make_img_gt_point_pair(self, index)
+    
+            # access JPG images
+           _img = Image.open(self.images[index]).convert('RGB')
+            
+            # access PNG images
+           _target = Image.open(self.categories[index])
+        
+           # return  achieved images with .jpg, and .png extensions
+           return _img, _target
+       # transform sample which image-label pair if training
+       def transform_tr(self, sample):
+            composed_transforms = transforms.Compose([
+                tr.RandomHorizontalFlip(),
+                tr.RandomScaleCrop(base_size=self.args.base_size, crop_size=self.args.crop_size),
+                tr.RandomGaussianBlur(),
+                tr.Normalize(mean=(0.485, 0.456, 0.406), std = (0.229, 0.224, 0.225)),
+                tr.ToTensor()])
+        
+           return composed_transforms(sample)
+        
+                                     
+      # transform sample which image-label pair if validating
+       def transform_val(self, sample):
+            composed_transform = transforms.Compose([
+                tr.FixScaleCrop(crop_size = slef.args.crop_size),
+                tr.Normalize(mean = (0.485, 0.456, 0.406), std = (0.229, 0.224, 0.225)),
+                tr.ToTensor()])
+           return composed_transforms(sample)
 
-        return composed_transforms(sample)
-    # validate transform
-    def transform_val(self, sample):
-
-        composed_transforms = transforms.Compose([
-            tr.FixScaleCrop(crop_size=self.args.crop_size),
-            tr.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-            tr.ToTensor()])
-
-        return composed_transforms(sample)
-
-
+    # return length of train images
     def __len__(self):
-        return len(self.ids)
+        return len(self.split)
 
 # __name__ == __main__ append desired different modules into dataset to deploy them
 # in this dataset
@@ -160,9 +162,9 @@ if __name__ == "__main__":
     args.base_size = 513
     args.crop_size = 513
 
-    coco_val = COCOSegmentation(args, split='val', year='2017')
+    apollo_val = ApolloScapesegmentation(args, split='val')
 
-    dataloader = DataLoader(coco_val, batch_size=4, shuffle=True, num_workers=0)
+    dataloader = DataLoader(apollo_val, batch_size=4, shuffle=True, num_workers=0)
 
     for ii, sample in enumerate(dataloader):
         for jj in range(sample["image"].size()[0]):
