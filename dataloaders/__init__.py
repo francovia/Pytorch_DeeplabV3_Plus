@@ -36,6 +36,7 @@ def make_data_loader(args, **kwargs):
         val_loader = DataLoader(val_set, batch_size=args.batch_size, shuffle=False, **kwargs)
         test_loader = None
         return train_loader, val_loader, test_loader, num_class
+    
     elif args.dataset == 'ApolloScape' :
         train_set == apolloscape.ApolloScapeSegmentation(args, split='train')
         val_set == apolloscape.ApolloScapeSegmentation(args, split='val')
@@ -43,7 +44,9 @@ def make_data_loader(args, **kwargs):
         train_loader = DataLoader(train_set, batch_size=args.batch_size, suffle=True, **kwargs)
         val_loader = Dataloader(val_set,batch_size=args.batch_size, suffle=False, **kwargs)
         test_loader = Dataloader(test_set, batch_size=args.batch_size, suffle=False, **kwargs)
+        
         return train_loader, val_loader, test_loader, num_class
+    
     else:
         raise NotImplementedError
 
