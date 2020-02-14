@@ -1,24 +1,16 @@
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-from modeling import deeplab
-from modeling import aspp
-from modeling.aspp import _ASPPModule, ASPP
-from modeling.deeplab import DeepLab
-from modeling.backbone import xception
 from mypath import Path
-import json
-from utils import calculate_weights,loss,lr_scheduler,metrics,saver,summaries
 from tqdm import trange
 import os
 from pycocotools.coco import COCO
 from pycocotools import mask
-import pycocotools._mask as _mask
 from torchvision import transforms
 from dataloaders import custom_transforms as tr
 from PIL import Image, ImageFile
-from mypath import Path
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+
 
 
 class COCOSegmentation(Dataset):
