@@ -27,6 +27,9 @@ def decode_segmap(label_mask, dataset, plot=False):
     elif dataset == 'cityscapes':
         n_classes = 19
         label_colours = get_cityscapes_labels()
+    elif dataset == 'apolloscape':
+        n_classes = 38
+        label_colours = get_apolloscape_labels()
     else:
         raise NotImplementedError
 
@@ -99,3 +102,19 @@ def get_pascal_labels():
                        [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
                        [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
                        [0, 64, 128]])
+def get_apolloscape_labels():
+     """Load the mapping that associates apolloscape classes with label colors
+    Returns:
+        np.ndarray with dimensions (38, 3)
+    """
+    return np.asarray([[0, 0, 0], [70, 130, 180], [220, 20, 60], [128, 0, 128],
+                       [255, 0, 0], [0, 0, 60], [0, 60, 100], [0, 0, 142],
+                      [119, 11, 32], [244, 35, 232], [0, 0, 160], [153, 153, 153],
+                      [220, 220, 0], [250, 170, 30], [102, 102, 156], [128, 0, 0],
+                      [128, 64, 128], [238, 232, 170], [190, 153, 153], [0, 0, 230],
+                      [128, 128, 0], [128, 78, 160], [150, 100, 100], [255, 165, 0],
+                      [180, 165, 180], [107, 142, 35], [201, 255, 229], [0, 191, 255],
+                      [51, 255, 51], [250, 128, 114], [127, 255, 0], [255, 128, 0],
+                      [0, 255, 255], [178, 132, 190], [128, 128, 64], [102, 0, 204],
+                      [0, 153, 153], [255, 255, 255]])
+    
