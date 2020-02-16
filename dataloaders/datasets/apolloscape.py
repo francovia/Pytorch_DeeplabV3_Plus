@@ -150,7 +150,8 @@ class ApolloScapeSegmentation(Dataset):
 # in this dataset
 
 if __name__ == "__main__":
-    from modeling.backbone import xception
+    # import deeplabv3+ and Xception('Extreme Inception') concatenation
+    from doc import deeplab_xception
     from dataloaders import custom_transforms as tr
     from dataloaders.utils import decode_segmap
     from torch.utils.data import DataLoader
