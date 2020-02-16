@@ -7,7 +7,7 @@ from modeling.decoder import build_decoder
 from modeling.backbone import build_backbone
 
 class DeepLab(nn.Module):
-    def __init__(self, backbone='resnet', output_stride=16, num_classes=21,
+    def __init__(self, backbone='xception', output_stride=16, num_classes=38,
                  sync_bn=True, freeze_bn=False):
         super(DeepLab, self).__init__()
         if backbone == 'drn':
@@ -40,7 +40,9 @@ class DeepLab(nn.Module):
                 m.eval()
 
     def get_1x_lr_params(self):
-        modules = [self.backbone]
+        modules = [self.backbo
+        if sync_bn == True:
+            BatchNorm = SynchronizedBatchNorm2dne]
         for i in range(len(modules)):
             for m in modules[i].named_modules():
                 if self.freeze_bn:
