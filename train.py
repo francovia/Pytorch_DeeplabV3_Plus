@@ -179,12 +179,12 @@ class Trainer(object):
 def main():
     parser = argparse.ArgumentParser(description="PyTorch DeeplabV3Plus Training")
     parser.add_argument('--backbone', type=str, default='resnet',
-                        choices=['resnet', 'xception', 'drn', 'mobilenet'],
+                        choices=['resnet', 'xception', 'drn', 'mobilenet', 'apolloscape'],
                         help='backbone name (default: resnet)')
     parser.add_argument('--out-stride', type=int, default=16,
                         help='network output stride (default: 8)')
     parser.add_argument('--dataset', type=str, default='pascal',
-                        choices=['pascal', 'coco', 'cityscapes'],
+                        choices=['pascal', 'coco', 'cityscapes', 'apolloscape'],
                         help='dataset name (default: pascal)')
     parser.add_argument('--use-sbd', action='store_true', default=True,
                         help='whether to use SBD dataset (default: True)')
@@ -268,6 +268,7 @@ def main():
             'coco': 30,
             'cityscapes': 200,
             'pascal': 50,
+            'apolloscape':30
         }
         args.epochs = epoches[args.dataset.lower()]
 
