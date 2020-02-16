@@ -52,7 +52,7 @@ Follow steps below to train your model:
 1. Input arguments: (see full input arguments via python train.py --help):
     ```Shell
     usage: train.py [-h] [--backbone {resnet,xception,drn,mobilenet}]
-                [--out-stride OUT_STRIDE] [--dataset {pascal,coco,cityscapes,apolloscape}]
+                [--out-stride OUT_STRIDE] [--dataset {pascal,coco,cityscapes}]
                 [--use-sbd] [--workers N] [--base-size BASE_SIZE]
                 [--crop-size CROP_SIZE] [--sync-bn SYNC_BN]
                 [--freeze-bn FREEZE_BN] [--loss-type {ce,focal}] [--epochs N]
