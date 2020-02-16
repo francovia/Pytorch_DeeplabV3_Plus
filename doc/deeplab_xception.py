@@ -296,7 +296,7 @@ class ASPP_module(nn.Module):
 
 
 class DeepLabv3_plus(nn.Module):
-    def __init__(self, nInputChannels=3, n_classes=21, os=16, pretrained=False, freeze_bn=False, _print=True):
+    def __init__(self, nInputChannels=3, n_classes=38, os=16, pretrained=False, freeze_bn=False, _print=True):
         if _print:
             print("Constructing DeepLabv3+ model...")
             print("Backbone: Xception")
@@ -414,7 +414,7 @@ def get_10x_lr_params(model):
 
 
 if __name__ == "__main__":
-    model = DeepLabv3_plus(nInputChannels=3, n_classes=21, os=16, pretrained=True, _print=True)
+    model = DeepLabv3_plus(nInputChannels=3, n_classes=38, os=16, pretrained=True, _print=True)
     model.eval()
     image = torch.randn(1, 3, 512, 512)
     with torch.no_grad():
