@@ -276,12 +276,13 @@ def main():
 
     if args.test_batch_size is None:
         args.test_batch_size = args.batch_size
-
+    # Additional dataset called Apolloscape for lr_rate is appended
     if args.lr is None:
         lrs = {
             'coco': 0.1,
             'cityscapes': 0.01,
             'pascal': 0.007,
+            'apolloscape':0.001
         }
         args.lr = lrs[args.dataset.lower()] / (4 * len(args.gpu_ids)) * args.batch_size
 
