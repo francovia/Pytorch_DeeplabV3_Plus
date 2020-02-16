@@ -268,7 +268,7 @@ def main():
             'coco': 30,
             'cityscapes': 200,
             'pascal': 50,
-            'apolloscape':30
+            'apolloscape': 30
         }
         args.epochs = epoches[args.dataset.lower()]
 
@@ -283,7 +283,7 @@ def main():
             'coco': 0.1,
             'cityscapes': 0.01,
             'pascal': 0.007,
-            'apolloscape':0.001
+            'apolloscape': 0.001
         }
         args.lr = lrs[args.dataset.lower()] / (4 * len(args.gpu_ids)) * args.batch_size
 
