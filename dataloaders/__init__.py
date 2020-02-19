@@ -40,7 +40,7 @@ def make_data_loader(args, **kwargs):
     elif args.dataset == 'apolloscape' :
         train_set = apolloscape.ApolloScapeSegmentation(args, split='train')
         val_set = apolloscape.ApolloScapeSegmentation(args, split='val')
-        test_set = apolloscape.ApolloScapeSegmentation(args, split='test')
+      
         num_class = train_set.NUM_CLASSES
         train_loader = DataLoader(train_set, batch_size=args.batch_size, suffle=True, **kwargs)
         val_loader = Dataloader(val_set,batch_size=args.batch_size, suffle=False, **kwargs)
