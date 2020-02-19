@@ -51,7 +51,7 @@ class ApolloScapeSegmentation(Dataset):
            for splt in self.split:
                 
                 # then, concatenating files inside one another, find csv file and read i
-                with open(os.path.join(os.path.join(_splits_dir, splt + '.csv')),r) as f:
+                with open(os.path.join(os.path.join(_splits_dir, splt + '.txt')),r) as f:
                     
                     # initialize lines and read all lines of f function insider directory
                     lines = f.read().splitlines()
