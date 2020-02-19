@@ -59,17 +59,17 @@ class ApolloScapeSegmentation(Dataset):
                 # Enumurate lines through loop, once we have also input(.jpg) and output(.png) 
                 # existed in the training file as well as csv file all together
                 
-                for ii, line in enumurate(lines):
+                for ii, line in enumerate(lines):
                     
                     # read input images which is regarded as jpg
                     _image = os.path.join(self._image_dir, line + '.jpg')
                     _cat = os.path.join(self._cat_dir, line + '.png')
                     
                     # check whether required _image file exist or not
-                    assert.os.path.isfile(_image)
+                    assert os.path.isfile(_image)
                     
                     # check whether required _cat file exist or not
-                    assert.os.path.isfile(_cat)
+                    assert os.path.isfile(_cat)
                     
                     # then as initialized above, append line which is following path numerate
                     # and will be regarded as csv file, append it to im_ids
