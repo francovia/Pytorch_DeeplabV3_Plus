@@ -21,10 +21,10 @@ class ApolloScapeSegmentation(Dataset):
             self._root_dir = root_dir
             
             # Original  Jpg images as input
-            self._image_dir = os.path.join(self._root_dir, 'Training_Images')
+            self._image_dir = os.path.join(self._root_dir, 'JPEGImages')
             
             # Grayscale images as output
-            self._cat_dir = os.path.join(self._root_dir, 'Grayscale_Images001' )
+            self._cat_dir = os.path.join(self._root_dir, 'Ground_Truth' )
             
             # if split == train 
             if isinstance(split,str):
@@ -41,7 +41,7 @@ class ApolloScapeSegmentation(Dataset):
             # Defining train and validation images  through__split__dir() - function
             # Input is '.jpg' and output is '.png'
             
-            _splits_dir = os.path.join(self._root_dir, 'Record001', 'Camera 5')
+            _splits_dir = os.path.join(self._root_dir, 'ImageSets', 'Segmentation')
             # create image_ids array,images as well as categories in order to append parameters into array
             self.im_ids = []
             self.images = []
