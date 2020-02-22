@@ -183,7 +183,7 @@ def main():
                         help='backbone name (default: resnet)')
     parser.add_argument('--out-stride', type=int, default=16,
                         help='network output stride (default: 8)')
-    parser.add_argument('--dataset', type=str, default='pascal',
+    parser.add_argument('--dataset', type=str, default='apolloscape',
                         choices=['pascal', 'coco', 'cityscapes', 'apolloscape'],
                         help='dataset name (default: pascal)')
     parser.add_argument('--use-sbd', action='store_true', default=True,
@@ -265,9 +265,9 @@ def main():
     # default settings for epochs, batch_size and lr
     if args.epochs is None:
         epoches = {
-            'coco': 30,
-            'cityscapes': 200,
-            'pascal': 50,
+#            'coco': 30,
+#            'cityscapes': 200,
+#            'pascal': 50,
             'apolloscape': 50
         }
         args.epochs = epoches[args.dataset.lower()]
@@ -280,9 +280,9 @@ def main():
     # Additional dataset called Apolloscape for lr_rate is appended
     if args.lr is None:
         lrs = {
-            'coco': 0.1,
-            'cityscapes': 0.01,
-            'pascal': 0.007,
+#            'coco': 0.1,
+#            'cityscapes': 0.01,
+#            'pascal': 0.007,
             'apolloscape': 0.007
         }
         args.lr = lrs[args.dataset.lower()] / (4 * len(args.gpu_ids)) * args.batch_size
