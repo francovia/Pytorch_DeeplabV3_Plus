@@ -50,14 +50,14 @@ class ApolloScapeSegmentation(Dataset):
            # loop through train file
            for splt in self.split:
                 
-                # then, concatenating files inside one another, find csv file and read i
+                # then, concatenating files inside one another, find txt file and read i
                 with open(os.path.join(os.path.join(_splits_dir, splt + '.txt')),r) as f:
                     
                     # initialize lines and read all lines of f function insider directory
                     lines = f.read().splitlines()
                     
                 # Enumurate lines through loop, once we have also input(.jpg) and output(.png) 
-                # existed in the training file as well as csv file all together
+                # existed in the training file as well as txt file all together
                 
                 for ii, line in enumerate(lines):
                     
@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
     apollo_train = ApolloScapeSegmentation(args, split='train')
 
-    dataloader = DataLoader(apollo_train, batch_size=4, shuffle=True, num_workers=0)
+    dataloader = DataLoader(apollo_train, batch_size=5, shuffle=True, num_workers=0)
 
     for ii, sample in enumerate(dataloader):
         for jj in range(sample["image"].size()[0]):
