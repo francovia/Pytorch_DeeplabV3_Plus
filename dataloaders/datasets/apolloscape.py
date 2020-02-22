@@ -164,9 +164,9 @@ if __name__ == "__main__":
     args.base_size = 513
     args.crop_size = 513
 
-    apollo_val = ApolloScapeSegmentation(args, split='train')
+    apollo_train = ApolloScapeSegmentation(args, split='train')
 
-    dataloader = DataLoader(apollo_val, batch_size=4, shuffle=True, num_workers=0)
+    dataloader = DataLoader(apollo_train, batch_size=4, shuffle=True, num_workers=0)
 
     for ii, sample in enumerate(dataloader):
         for jj in range(sample["image"].size()[0]):
