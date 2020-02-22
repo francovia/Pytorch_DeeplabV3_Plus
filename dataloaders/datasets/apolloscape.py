@@ -164,7 +164,7 @@ if __name__ == "__main__":
     args.base_size = 513
     args.crop_size = 513
 
-    apollo_val = ApolloScapeSegmentation(args, split='val')
+    apollo_val = ApolloScapeSegmentation(args, split='train')
 
     dataloader = DataLoader(apollo_val, batch_size=4, shuffle=True, num_workers=0)
 
